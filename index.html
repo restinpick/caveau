@@ -181,6 +181,8 @@ table.ttfl td.or{color:var(--or)} table.ttfl td.ca{color:var(--carotte)}
 .duel .sc{font:400 30px/1 var(--f-titre);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:center}
 .duel .sc i{font-style:normal;color:var(--pierre);margin:0 6px}
 .duel .gagne{color:var(--or)}
+.duel .ecart{display:block;width:max-content;margin:6px auto 0;padding:3px 9px;border-radius:20px;background:var(--or);color:var(--encre);font:800 14px/1 var(--f-corps);letter-spacing:.03em}
+.duel .ecart.eg{background:var(--pierre)}
 .affiche .duel .cote img{width:62px;height:72px}
 .affiche .duel .sc{font-size:clamp(34px,10vw,48px)}
 .affiche .st{font:italic 400 17px/1.3 var(--f-plume);color:var(--or2);text-align:center;margin-top:10px}
@@ -364,7 +366,9 @@ function blocDuel(du,j,grand){
   if(ex) return '<div class="carte"><div class="duel"><div class="cote"><img src="'+mai(du.a)+'" alt=""><b>'+esc(aff(du.a))+'</b></div><div class="sc muet" style="font-size:18px">EXEMPT</div><div></div></div></div>';
   const ga=fin&&du.v==du.a, gb=fin&&du.v==du.b;
   const sc=j.statut=='annoncee'?'<span class="muet">VS</span>':'<span class="'+(ga?'gagne':'')+'">'+nf(du.sa)+'</span><i>–</i><span class="'+(gb?'gagne':'')+'">'+nf(du.sb)+'</span>';
-  const tete='<div class="duel"><a class="cote" href="'+lienM(du.a)+'"><img src="'+mai(du.a)+'" alt=""><b>'+esc(aff(du.a))+'</b></a><div class="sc">'+sc+'</div><a class="cote d" href="'+lienM(du.b)+'"><img src="'+mai(du.b)+'" alt=""><b>'+esc(aff(du.b))+'</b></a></div>'+
+  const e=j.statut=='annoncee'?null:du.sa-du.sb;      // 25/10 : pastille d'ecart, la fleche pointe vers celui qui mene
+  const pas=e===null?'':(e===0?'<span class="ecart eg">ÉGALITÉ</span>':'<span class="ecart">'+(e>0?'◂ +'+nf(e):'+'+nf(-e)+' ▸')+'</span>');
+  const tete='<div class="duel"><a class="cote" href="'+lienM(du.a)+'"><img src="'+mai(du.a)+'" alt=""><b>'+esc(aff(du.a))+'</b></a><div class="sc">'+sc+pas+'</div><a class="cote d" href="'+lienM(du.b)+'"><img src="'+mai(du.b)+'" alt=""><b>'+esc(aff(du.b))+'</b></a></div>'+
     (du.affiche&&du.st?'<div class="st">« '+esc(du.st)+' »</div>':'');
   if(!du.nuits.length) return '<div class="'+(du.affiche?'affiche':'carte')+'">'+(du.affiche?'<span class="eti">L\'AFFICHE</span>':'')+tete+'</div>';
   const lig=du.nuits.map(n=>'<tr><td class="j">'+jourC(n.d)+'</td><td class="pk'+(n.a[2]?' car':'')+(n.a[3]?' bst':'')+'">'+esc(n.a[1])+(n.a[4]?' <span class="badge x2">x2</span>':'')+'</td><td class="p'+(n.a[2]?' car':'')+'">'+n.a[0]+'</td><td class="p r'+(n.b[2]?' car':'')+'">'+n.b[0]+'</td><td class="pk r'+(n.b[2]?' car':'')+(n.b[3]?' bst':'')+'">'+esc(n.b[1])+(n.b[4]?' <span class="badge x2">x2</span>':'')+'</td></tr>').join('');
