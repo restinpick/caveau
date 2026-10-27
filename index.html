@@ -192,12 +192,14 @@ details.dd>summary{list-style:none;cursor:pointer;padding:12px 14px}
 details.dd>summary::-webkit-details-marker{display:none}
 details.dd[open]>summary{border-bottom:1px solid var(--trait)}
 details.dd.affiche{border:2px solid var(--or);background:radial-gradient(ellipse 80% 120% at 50% 0%,rgba(201,162,39,.18),transparent 70%),var(--charbon);padding:0}
-.nn{width:100%;border-collapse:collapse;font-size:15px}
+.nn{width:100%;border-collapse:collapse;font-size:15px;table-layout:fixed}
 .nn td{padding:7px 10px;border-top:1px solid var(--trait);vertical-align:top}
 .nn tr:first-child td{border-top:0}
-.nn .j{color:var(--pierre);font-weight:800;white-space:nowrap;width:1%}
-.nn .p{font:400 20px/1 var(--f-titre);white-space:nowrap;font-variant-numeric:tabular-nums}
-.nn .pk{color:var(--os2)} .nn .r{text-align:right}
+.nn .j{color:var(--pierre);font-weight:800;white-space:nowrap;width:76px}
+.nn .p{font:400 20px/1 var(--f-titre);white-space:nowrap;font-variant-numeric:tabular-nums;width:58px;text-align:center}
+.nn .pk{color:var(--os2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .nn .pk.r{text-align:right}
+.nn .esp{width:76px;padding:0}
+@media (max-width:520px){.nn{font-size:13px}.nn .j{width:46px;font-size:11px;white-space:normal;line-height:1.15}.nn .p{width:40px;font-size:18px}.nn .esp{display:none}}
 .nn .car{color:var(--carotte)} .nn .bst{color:var(--or)}
 .voir{font:800 12px/1 var(--f-corps);letter-spacing:.16em;color:var(--pierre);text-transform:uppercase;text-align:center;margin-top:8px}
 .defile{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);border:1px solid var(--trait);background:var(--charbon)}
@@ -371,7 +373,7 @@ function blocDuel(du,j,grand){
   const tete='<div class="duel"><a class="cote" href="'+lienM(du.a)+'"><img src="'+mai(du.a)+'" alt=""><b>'+esc(aff(du.a))+'</b></a><div class="sc">'+sc+pas+'</div><a class="cote d" href="'+lienM(du.b)+'"><img src="'+mai(du.b)+'" alt=""><b>'+esc(aff(du.b))+'</b></a></div>'+
     (du.affiche&&du.st?'<div class="st">« '+esc(du.st)+' »</div>':'');
   if(!du.nuits.length) return '<div class="'+(du.affiche?'affiche':'carte')+'">'+(du.affiche?'<span class="eti">L\'AFFICHE</span>':'')+tete+'</div>';
-  const lig=du.nuits.map(n=>'<tr><td class="j">'+jourC(n.d)+'</td><td class="pk'+(n.a[2]?' car':'')+(n.a[3]?' bst':'')+'">'+esc(n.a[1])+(n.a[4]?' <span class="badge x2">x2</span>':'')+'</td><td class="p'+(n.a[2]?' car':'')+'">'+n.a[0]+'</td><td class="p r'+(n.b[2]?' car':'')+'">'+n.b[0]+'</td><td class="pk r'+(n.b[2]?' car':'')+(n.b[3]?' bst':'')+'">'+esc(n.b[1])+(n.b[4]?' <span class="badge x2">x2</span>':'')+'</td></tr>').join('');
+  const lig=du.nuits.map(n=>'<tr><td class="j">'+jourC(n.d)+'</td><td class="pk'+(n.a[2]?' car':'')+(n.a[3]?' bst':'')+'" title="'+esc(n.a[1])+'">'+esc(n.a[1])+(n.a[4]?' <span class="badge x2">x2</span>':'')+'</td><td class="p'+(n.a[2]?' car':'')+'">'+n.a[0]+'</td><td class="p r'+(n.b[2]?' car':'')+'">'+n.b[0]+'</td><td class="pk r'+(n.b[2]?' car':'')+(n.b[3]?' bst':'')+'" title="'+esc(n.b[1])+'">'+esc(n.b[1])+(n.b[4]?' <span class="badge x2">x2</span>':'')+'</td><td class="esp"></td></tr>').join('');
   return '<details class="dd'+(du.affiche?' affiche':'')+'"'+(grand?' open':'')+'><summary>'+(du.affiche?'<span class="eti">L\'AFFICHE</span>':'')+tete+'<div class="voir">Nuit par nuit · hors bonus x2</div></summary>'+
     '<div style="overflow-x:auto"><table class="nn">'+lig+'</table></div></details>';
 }
