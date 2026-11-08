@@ -366,10 +366,11 @@ function actif(p){document.querySelectorAll('[data-p]').forEach(a=>a.classList.t
 function blocDuel(du,j,grand){
   const fin=j.statut=='terminee', ex=du.exempt;
   if(ex) return '<div class="carte"><div class="duel"><div class="cote"><img src="'+mai(du.a)+'" alt=""><b>'+esc(aff(du.a))+'</b></div><div class="sc muet" style="font-size:18px">EXEMPT</div><div></div></div></div>';
-  const ga=fin&&du.v==du.a, gb=fin&&du.v==du.b;
+  const ff=du.ff&&j.statut!='annoncee';                // 08/11 : forfait = victoire du restant, scores figes au depart
+  const ga=(fin||ff)&&du.v==du.a, gb=(fin||ff)&&du.v==du.b;
   const sc=j.statut=='annoncee'?'<span class="muet">VS</span>':'<span class="'+(ga?'gagne':'')+'">'+nf(du.sa)+'</span><i>–</i><span class="'+(gb?'gagne':'')+'">'+nf(du.sb)+'</span>';
   const e=j.statut=='annoncee'?null:du.sa-du.sb;      // 25/10 : pastille d'ecart, la fleche pointe vers celui qui mene
-  const pas=e===null?'':(e===0?'<span class="ecart eg">ÉGALITÉ</span>':'<span class="ecart">'+(e>0?'◂ +'+nf(e):'+'+nf(-e)+' ▸')+'</span>');
+  const pas=ff?'<span class="ecart">FORFAIT · '+esc(aff(du.ff))+' a quitté l\'équipe</span>':e===null?'':(e===0?'<span class="ecart eg">ÉGALITÉ</span>':'<span class="ecart">'+(e>0?'◂ +'+nf(e):'+'+nf(-e)+' ▸')+'</span>');
   const tete='<div class="duel"><a class="cote" href="'+lienM(du.a)+'"><img src="'+mai(du.a)+'" alt=""><b>'+esc(aff(du.a))+'</b></a><div class="sc">'+sc+pas+'</div><a class="cote d" href="'+lienM(du.b)+'"><img src="'+mai(du.b)+'" alt=""><b>'+esc(aff(du.b))+'</b></a></div>'+
     (du.affiche&&du.st?'<div class="st">« '+esc(du.st)+' »</div>':'');
   if(!du.nuits.length) return '<div class="'+(du.affiche?'affiche':'carte')+'">'+(du.affiche?'<span class="eti">L\'AFFICHE</span>':'')+tete+'</div>';
