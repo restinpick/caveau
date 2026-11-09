@@ -489,22 +489,29 @@ function pRecords(){
 // ---------- galerie
 function tuileM(m,liste){
   const i=liste.indexOf(m);
-  const lg='<span class="lg">'+esc(m.titre)+'<small>'+(m.d?jourC(m.d):'')+'</small></span>';
+  const lg=m.cat=='nuit'?'<span class="lg">'+(m.d?jourC(m.d):esc(m.titre))+'</span>':'<span class="lg">'+esc(m.titre)+'<small>'+(m.d?jourC(m.d):'')+'</small></span>';
   if(m.t=='lien') return '<a class="tuile-m yt" href="'+esc(m.url)+'" target="_blank" rel="noopener">'+(m.vign?'<img src="'+m.vign+'" alt="" loading="lazy">':'<span style="display:block;aspect-ratio:16/9"></span>')+'<span class="lecture">'+ICO.play+'</span><span class="lg">'+esc(m.titre)+'<small>'+(m.d?jourC(m.d)+' · ':'')+'Voir sur YouTube</small></span></a>';
   if(m.t=='pdf') return '<a class="tuile-m" href="'+m.src+'" target="_blank" rel="noopener" style="display:grid;place-items:center;aspect-ratio:4/5"><span class="gt" style="font:700 26px/1 var(--f-goth);padding:12px;text-align:center">PDF</span>'+lg+'</a>';
   return '<button class="tuile-m" data-vis="'+i+'" data-liste="'+(liste===visSource?'g':'v')+'">'+(m.vign?'<img src="'+m.vign+'" alt="" loading="lazy">':'<span style="display:block;aspect-ratio:16/10"></span>')+(m.t=='video'?'<span class="lecture">'+ICO.play+'</span>':'')+lg+'</button>';
 }
 let visSource=[];
 function pGalerie(){
-  const cats=[['semaine','Les semaines'],['lien','RIP TV'],['evenement','Événements']].filter(([k])=>k=='semaine'||k==galCat||S.medias.some(m=>m.cat==k));
-  let h='<section class="hero"><div class="sur">Le caveau en images</div><h1 class="titre">La galerie</h1><p class="plume" style="margin:4px 0 0">Les affiches et les duels sur le parquet de chaque semaine, les émissions de RIP TV et les événements.</p></section>';
+  const cats=[['semaine','Les semaines'],['lien','RIP TV'],['echo','L\'Écho du Caveau'],['nuit','Les nuits'],['evenement','Événements']].filter(([k])=>k=='semaine'||k==galCat||(k=='echo'?(S.echos||[]).length:S.medias.some(m=>m.cat==k)));
+  let h='<section class="hero"><div class="sur">Le caveau en images</div><h1 class="titre">La galerie</h1><p class="plume" style="margin:4px 0 0">Les affiches et les duels de chaque semaine, RIP TV, L\'Écho du Caveau, le visuel de chaque nuit et les événements.</p></section>';
   h+='<div class="onglets" role="tablist" style="margin-top:14px">'+cats.map(([k,l])=>'<button role="tab" class="'+(galCat==k?'on':'')+'" data-cat="'+k+'">'+l+'</button>').join('')+'</div>';
+  if(galCat=='echo'){
+    const jd0={};S.champ.journees.forEach(j=>jd0[j.deck]=j.n);
+    const E=S.echos||[];
+    h+=E.length?'<div class="grille2" style="margin-top:14px">'+E.map(e=>'<div class="carte echo"><img src="'+e.couverture+'" alt="Couverture du n°'+e.n+'" loading="lazy"><div style="display:grid;gap:8px;min-width:0"><div class="gt">N°'+e.n+'</div><div class="muet" style="font-weight:700">'+(e.deck?'Semaine '+(jd0[e.deck]||e.deck)+' · ':'')+e.pages.length+' pages</div><div class="boutons"><button class="bouton" data-echo="'+e.n+'">Feuilleter</button>'+(e.pdf?'<a class="bouton creux" href="'+e.pdf+'" target="_blank" rel="noopener">PDF</a>':'')+'</div></div></div>').join('')+'</div>':'<p class="vide" style="margin-top:14px">Aucun numéro publié.</p>';
+    return h;
+  }
   const ms=S.medias.filter(m=>m.cat==galCat).sort((a,b)=>(b.deck||0)-(a.deck||0)||(b.d||'').localeCompare(a.d||'')||a.titre.localeCompare(b.titre));
   visSource=ms;
   if(!ms.length) return h+'<p class="vide" style="margin-top:14px">Rien dans cette rubrique pour l\'instant.</p>';
   const grp={};
   const jd={};S.champ.journees.forEach(j=>jd[j.deck]=j.n);
-  ms.forEach(m=>{const k=galCat=='semaine'?('Semaine '+(jd[m.deck]||m.deck||'')):galCat=='lien'?'RIP TV sur YouTube':'Saison '+S.meta.saison;(grp[k]=grp[k]||[]).push(m)});
+  const moisL=d=>{const t=dt(d).toLocaleDateString('fr-FR',{month:'long',year:'numeric'});return t.charAt(0).toUpperCase()+t.slice(1)};
+  ms.forEach(m=>{const k=galCat=='semaine'?('Semaine '+(jd[m.deck]||m.deck||'')):galCat=='lien'?'RIP TV sur YouTube':galCat=='nuit'?(m.d?moisL(m.d):'Saison '+S.meta.saison):'Saison '+S.meta.saison;(grp[k]=grp[k]||[]).push(m)});
   Object.keys(grp).forEach(k=>{h+='<div class="groupe"><h3>'+esc(k)+'</h3><div class="mur'+(galCat=='lien'?' yt':'')+'">'+grp[k].map(m=>tuileM(m,ms)).join('')+'</div></div>';});
   return h;
 }
@@ -538,6 +545,7 @@ function rendre(){
   else h=({accueil:pAccueil,classement:pClassement,membres:pMembres,records:pRecords,galerie:pGalerie,reglement:pReglement}[t]||pAccueil)();
   const pied='<footer class="pied"><div class="gt">RestInPick</div>Fossoyeur officieux de la TTFL · mis à jour le '+esc(S.meta.genere)+(S.meta.derniere_nuit?' · dernière nuit : '+jourC(S.meta.derniere_nuit):'')+'</footer>';
   document.getElementById('page').innerHTML=h+pied;
+  const og=document.querySelector('.onglets .on'); if(og&&og.parentNode.scrollWidth>og.parentNode.clientWidth) og.parentNode.scrollLeft=og.offsetLeft-og.parentNode.offsetLeft-16;
   actif(p);
 }
 function demarrer(){
